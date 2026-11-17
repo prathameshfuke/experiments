@@ -18,9 +18,12 @@ PLAN = {  # exp number -> [(kind, source, caption)]
            ("gd", "stick_nor", "Stick diagram of the NOR gate.")],
     "07": [("msk", "MUX", "Layout view of the 2-to-1 multiplexer (MUX.MSK)."),
            ("gd", "gate_tg", "Transmission gate: NMOS and PMOS in parallel."),
-           ("gd", "gate_mux", "2-to-1 MUX built from two transmission gates.")],
+           ("gd", "gate_mux", "2-to-1 MUX built from two transmission gates."),
+           ("gd", "stick_tg", "Stick diagram of the transmission gate."),
+           ("gd", "stick_mux", "Stick diagram of the 2-to-1 MUX.")],
     "08": [("msk", "SRAM", "Layout view of the 6T SRAM cell (SRAM.MSK)."),
-           ("gd", "gate_sram", "6T SRAM cell: cross-coupled inverters plus two access transistors.")],
+           ("gd", "gate_sram", "6T SRAM cell: cross-coupled inverters plus two access transistors."),
+           ("gd", "stick_sram", "Stick diagram of the 6T SRAM cell.")],
     "10": [("msk", "DFF", "Layout view of the CMOS D flip-flop (DFF.MSK).")],
 }
 MARK = "Microwind layout view"

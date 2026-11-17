@@ -123,7 +123,7 @@ def b_tg(ax):  # transmission gate: NMOS and PMOS in parallel
 
 
 def b_mux(ax):  # 2:1 mux from two transmission gates
-    for y, a, g1, g2 in ((1.2, "A", "S'", "S"), (-1.2, "B", "S", "S'")):
+    for y, a, g1, g2 in ((1.2, "A", "S", "S'"), (-1.2, "B", "S'", "S")):
         ax.text(-0.3, y, a, ha="right", va="center", fontsize=11, weight="bold")
         ax.plot([0, 1], [y, y], color=INK, lw=2)
         ax.add_patch(Rectangle((1, y - 0.55), 2, 1.1, fc="#eef2ff", ec=INK, lw=1.6))
@@ -148,38 +148,117 @@ def b_sram(ax):  # cross-coupled inverters (4T) + two access NMOS (2T)
 
 
 GREEN, ORANGE, POLY, METAL = "#2eaa3c", "#e8a317", "#d62828", "#2f5be7"
+VDDY, PY, BUS, NY, GNDY = 9.5, 7.0, 4.3, 1.6, -1.6
 
 
-def stick(name, inputs, kind):
-    """Stick diagram: green n-diff, orange p-diff, red poly, blue metal, black contacts."""
-    fig, ax = plt.subplots(figsize=(4.6, 4.6), dpi=170)
-    ax.set_aspect("equal"); ax.axis("off"); ax.set_title(name + " - stick diagram", fontsize=11, weight="bold", color=INK)
-    n = len(inputs); W = 2 + 2 * n
-    ax.plot([0, W], [8, 8], color=METAL, lw=4); ax.text(-0.2, 8, "VDD", ha="right", va="center", color=METAL, fontsize=9, weight="bold")
-    ax.plot([0, W], [0, 0], color=METAL, lw=4); ax.text(-0.2, 0, "GND", ha="right", va="center", color=METAL, fontsize=9, weight="bold")
-    ax.plot([1, W - 1], [6, 6], color=ORANGE, lw=5, solid_capstyle="butt"); ax.text(W - 0.9, 6.5, "p-diff", fontsize=7, color=ORANGE)
-    ax.plot([1, W - 1], [2, 2], color=GREEN, lw=5, solid_capstyle="butt"); ax.text(W - 0.9, 1.3, "n-diff", fontsize=7, color=GREEN)
-    cols = [2 + 2 * i for i in range(n)]
-    for c, nm in zip(cols, inputs):
-        ax.plot([c, c], [-0.8, 7], color=POLY, lw=3); ax.text(c, -1.3, nm, ha="center", color=POLY, fontsize=10, weight="bold")
+class Stick:
+    def __init__(self, title, width, note=None):
+        self.fig, self.ax = plt.subplots(figsize=(max(3.6, (width + 4) * 0.5), 4.7), dpi=170)
+        ax = self.ax; ax.set_aspect("equal"); ax.axis("off")
+        ax.set_title(title + " - stick diagram", fontsize=11, weight="bold", color=INK)
+        ax.set_xlim(-2.2, width + 2.2); ax.set_ylim(-2.6, 10.6)
+        self.w = width
+        if note: ax.text(width / 2, -2.4, note, ha="center", fontsize=7, style="italic", color="#374151")
 
-    def con(x, y): ax.add_patch(Rectangle((x - 0.15, y - 0.15), 0.3, 0.3, fc="black", zorder=4))
+    def rails(self, x1, x2, xv=None):
+        ax = self.ax
+        ax.plot([x1, x2], [VDDY, VDDY], color=METAL, lw=4); ax.text(x1 - 0.2, VDDY, "VDD", ha="right", va="center", color=METAL, fontsize=9, weight="bold")
+        ax.plot([x1, x2], [GNDY, GNDY], color=METAL, lw=4); ax.text(x1 - 0.2, GNDY, "GND", ha="right", va="center", color=METAL, fontsize=9, weight="bold")
 
-    def wire(x1, y1, x2, y2): ax.plot([x1, x2], [y1, y2], color=METAL, lw=3)
-    out = lambda x: (wire(x, 4, W + 0.6, 4), ax.text(W + 0.7, 4, "Y", va="center", fontsize=10, weight="bold"))
+    def diff(self, row, x1, x2):
+        y, c = (PY, ORANGE) if row == "p" else (NY, GREEN)
+        self.ax.plot([x1, x2], [y, y], color=c, lw=6, solid_capstyle="butt")
+
+    def poly(self, x, label, full=True, row=None):
+        if full: y1, y2, ly, va = -0.6, 8.4, 8.8, "bottom"
+        elif row == "p": y1, y2, ly, va = 5.8, 8.4, 8.8, "bottom"
+        else: y1, y2, ly, va = -0.6, 2.8, -0.8, "top"
+        self.ax.plot([x, x], [y1, y2], color=POLY, lw=3, solid_capstyle="butt")
+        self.ax.text(x, ly, label, ha="center", va=va, color=POLY, fontsize=10, weight="bold")
+
+    def con(self, x, y):
+        self.ax.add_patch(Rectangle((x - 0.17, y - 0.17), 0.34, 0.34, fc="black", zorder=4))
+
+    def wire(self, *pts):
+        self.ax.plot([p[0] for p in pts], [p[1] for p in pts], color=METAL, lw=3, solid_capstyle="round", solid_joinstyle="round")
+
+    def label(self, x, y, t, **k):
+        self.ax.text(x, y, t, fontsize=10, weight="bold", va="center", **k)
+
+    # node helpers: contact on diffusion + metal to a target
+    def to_vdd(self, x): self.con(x, PY); self.wire((x, PY), (x, VDDY))
+    def to_gnd(self, x): self.con(x, NY); self.wire((x, NY), (x, GNDY))
+    def p_out(self, x): self.con(x, PY); self.wire((x, PY), (x, BUS))
+    def n_out(self, x): self.con(x, NY); self.wire((x, NY), (x, BUS))
+
+
+def gate_block(s, x0, kind, ins):
+    """NOT / NAND / NOR block with nodes at x0+1, +3, (+5); returns the x of its output bus node."""
+    n = len(ins); xe = x0 + 2 * n + 1
+    s.diff("p", x0 + 1, xe); s.diff("n", x0 + 1, xe)
+    for i, nm in enumerate(ins): s.poly(x0 + 2 + 2 * i, nm)
     if kind == "not":
-        con(1, 6); wire(1, 6, 1, 8); con(1, 2); wire(1, 2, 1, 0)
-        con(3, 6); con(3, 2); wire(3, 2, 3, 6); out(3)
-    elif kind == "nand":  # p in parallel to VDD, n in series to GND
-        for x in (1, 5): con(x, 6); wire(x, 6, x, 8)
-        con(3, 6); con(3, 2); wire(3, 2, 3, 6); out(3)
-        con(1, 2); wire(1, 2, 1, 0)
-    else:  # nor: p in series from VDD, n in parallel to GND
-        con(1, 6); wire(1, 6, 1, 8)
-        con(5, 6); con(5, 2); wire(5, 2, 5, 6); out(5)
-        for x in (1, 3): con(x, 2); wire(x, 2, x, 0)
-    ax.set_xlim(-1.8, W + 1.6); ax.set_ylim(-2, 9)
-    return fig
+        s.to_vdd(x0 + 1); s.to_gnd(x0 + 1); s.p_out(x0 + 3); s.n_out(x0 + 3); return x0 + 3
+    if kind == "nand":  # p parallel (VDD at ends, Y middle); n series (GND left, Y right)
+        s.to_vdd(x0 + 1); s.to_vdd(x0 + 5); s.p_out(x0 + 3); s.to_gnd(x0 + 1); s.n_out(x0 + 5)
+        s.wire((x0 + 3, BUS), (x0 + 5, BUS)); return x0 + 5
+    # nor: p series (VDD left, Y right); n parallel (GND at ends, Y middle)
+    s.to_vdd(x0 + 1); s.p_out(x0 + 5); s.to_gnd(x0 + 1); s.to_gnd(x0 + 5); s.n_out(x0 + 3)
+    s.wire((x0 + 3, BUS), (x0 + 5, BUS)); return x0 + 5
+
+
+def stick(kind):
+    if kind in ("not", "nand", "nor"):
+        ins = ["A"] if kind == "not" else ["A", "B"]; w = 4 if kind == "not" else 6
+        s = Stick({"not": "NOT", "nand": "NAND", "nor": "NOR"}[kind], w + 2)
+        s.rails(0, w + 1); xo = gate_block(s, 0, kind, ins)
+        s.wire((xo, BUS), (xo + 1.6, BUS)); s.label(xo + 1.8, BUS, "Y"); return s.fig
+    if kind in ("and", "or"):
+        first = "nand" if kind == "and" else "nor"
+        s = Stick(kind.upper() + " = %s + inverter" % first.upper(), 14)
+        s.rails(0, 13); xo = gate_block(s, 0, first, ["A", "B"])
+        xi = 9; xo2 = gate_block(s, 7, "not", ["X"])
+        s.wire((xo, BUS), (xi, BUS)); s.con(xi, BUS)
+        s.wire((xo2, BUS), (xo2 + 1.6, BUS)); s.label(xo2 + 1.8, BUS, "Y"); return s.fig
+    if kind in ("xor", "xnor"):
+        s = Stick(kind.upper(), 12, "poly stubs with the same name are joined by metal; A' and B' come from two inverters")
+        s.rails(0, 12)
+        p1, p2 = (("A", "B'"), ("A'", "B")) if kind == "xor" else (("A", "B"), ("A'", "B'"))
+        n1, n2 = (("A", "B"), ("A'", "B'")) if kind == "xor" else (("A", "B'"), ("A'", "B"))
+        for (x, g) in ((2, p1[0]), (4, p1[1]), (8, p2[0]), (10, p2[1])): s.poly(x, g, False, "p")
+        for (x, g) in ((2, n1[0]), (4, n1[1]), (8, n2[0]), (10, n2[1])): s.poly(x, g, False, "n")
+        s.diff("p", 1, 5); s.diff("p", 7, 11); s.diff("n", 1, 5); s.diff("n", 7, 11)
+        s.to_vdd(1); s.to_vdd(11); s.p_out(5); s.p_out(7); s.n_out(1); s.n_out(11)
+        s.to_gnd(5); s.to_gnd(7)
+        s.wire((1, BUS), (11, BUS)); s.wire((11, BUS), (12.6, BUS)); s.label(12.8, BUS, "Y"); return s.fig
+    if kind == "tg":
+        s = Stick("Transmission gate", 4, "S and S' poly are separate; IN joins both left nodes, OUT both right nodes")
+        s.diff("p", 1, 3); s.diff("n", 1, 3); s.poly(2, "S'", False, "p"); s.poly(2, "S", False, "n")
+        for x in (1, 3): s.con(x, PY); s.con(x, NY); s.wire((x, NY), (x, PY))
+        s.wire((-0.6, BUS), (1, BUS)); s.label(-0.8, BUS, "IN", ha="right"); s.wire((3, BUS), (4.6, BUS)); s.label(4.8, BUS, "OUT")
+        return s.fig
+    if kind == "mux":
+        s = Stick("2:1 MUX (two transmission gates)", 10, "S' is made by one inverter on S (not drawn)")
+        for x0, flip, ins, ng, pg in ((0, False, "A", "S'", "S"), (6, True, "B", "S", "S'")):
+            s.diff("p", x0 + 1, x0 + 3); s.diff("n", x0 + 1, x0 + 3)
+            s.poly(x0 + 2, pg, False, "p"); s.poly(x0 + 2, ng, False, "n")
+            for x in (x0 + 1, x0 + 3): s.con(x, PY); s.con(x, NY); s.wire((x, NY), (x, PY))
+        s.wire((-0.6, BUS), (1, BUS)); s.label(-0.8, BUS, "A", ha="right")
+        s.wire((9, BUS), (10.6, BUS)); s.label(10.8, BUS, "B")
+        s.wire((3, BUS), (7, BUS)); s.wire((5, BUS), (5, 5.8)); s.label(5, 6.3, "Y", ha="center")
+        return s.fig
+    if kind == "sram":
+        s = Stick("6T SRAM cell", 12, "WL, Q and Q' poly of the same name are joined by metal")
+        s.rails(2.2, 9.8)
+        s.diff("p", 3, 5); s.diff("p", 7, 9); s.diff("n", 1, 5); s.diff("n", 7, 11)
+        s.poly(4, "Q'"); s.poly(8, "Q")
+        s.poly(2, "WL", False, "n"); s.poly(10, "WL", False, "n")
+        s.to_vdd(3); s.to_vdd(9); s.to_gnd(5); s.to_gnd(7)
+        s.p_out(5); s.n_out(3); s.wire((3, BUS), (5, BUS)); s.label(3.75, BUS + 0.7, "Q", ha="right")
+        s.p_out(7); s.n_out(9); s.wire((7, BUS), (9, BUS)); s.label(8.25, BUS + 0.7, "Q'", ha="left")
+        for x, t in ((1, "BL"), (11, "BL'")):
+            s.con(x, NY); s.wire((x, NY), (x, -0.3)); s.label(x, -0.85, t, ha="center")
+        return s.fig
 
 
 GATES = [("NOT (Inverter)", "not", b_not, (3.6, 4.6)), ("NAND (4T)", "nand", b_nand, (4.6, 4.6)),
@@ -192,6 +271,6 @@ if __name__ == "__main__":
     out = sys.argv[1]; os.makedirs(out, exist_ok=True)
     for title, key, fn, sz in GATES:
         f = fig_for(title, fn, sz); f.savefig(os.path.join(out, "gate_%s.png" % key), facecolor="white"); plt.close(f)
-    for title, kind, ins in (("NOT", "not", ["A"]), ("NAND", "nand", ["A", "B"]), ("NOR", "nor", ["A", "B"])):
-        f = stick(title, ins, kind); f.savefig(os.path.join(out, "stick_%s.png" % kind), facecolor="white"); plt.close(f)
+    for kind in ("not", "nand", "nor", "and", "or", "xor", "xnor", "tg", "mux", "sram"):
+        f = stick(kind); f.savefig(os.path.join(out, "stick_%s.png" % kind), facecolor="white"); plt.close(f)
     print("done")
