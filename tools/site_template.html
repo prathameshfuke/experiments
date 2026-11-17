@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VLSI and MIOT Lab Files</title>
+<meta name="description" content="Documents, code and Microwind files for the VLSI D&amp;T and MIOT lab experiments, with one-click downloads.">
+<style>
+:root{
+  --paper:#f2f4f7;--card:#ffffff;--ink:#0e1726;--mute:#566170;--line:#d8dde4;--dot:#c9d0d9;
+  --vlsi:#2547f5;--miot:#1f8a3b;--poly:#d8321f;--tint:#eaeefc;--tintg:#e6f3ea;--onacc:#ffffff;
+  --r:10px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#07090c;--card:#10141a;--ink:#e7ecf2;--mute:#8f9aa8;--line:#232b35;--dot:#1c242d;
+  --vlsi:#8aa0ff;--miot:#5ccb78;--poly:#ff6a55;--tint:#16203f;--tintg:#12301c;--onacc:#07090c;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;color:var(--ink);background:var(--paper);
+  background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:22px 22px;
+  font:16px/1.55 "Avenir Next","Segoe UI Variable","Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--poly);outline-offset:2px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:8px 12px;border-radius:8px;z-index:30}
+.skip:focus{left:8px}
+
+/* top bar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar>div{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.brand{font-weight:800;letter-spacing:-.02em;text-decoration:none;white-space:nowrap}
+.brand i{display:inline-block;width:10px;height:10px;background:var(--vlsi);box-shadow:12px 0 0 var(--miot),24px 0 0 var(--poly);margin-right:36px;border-radius:2px}
+.find{flex:1;position:relative}
+.find input{width:100%;height:42px;padding:0 44px 0 14px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--card);color:var(--ink);font:inherit}
+.find input:focus{border-color:var(--vlsi);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--vlsi) 25%,transparent)}
+.find kbd{position:absolute;right:10px;top:9px;border:1px solid var(--line);border-radius:6px;padding:0 7px;font:13px/22px inherit;color:var(--mute);background:var(--paper)}
+.btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:var(--r);background:var(--ink);color:var(--paper);font-weight:700;text-decoration:none;border:0;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.15)}
+.btn.sm{height:36px;padding:0 13px;font-size:.92rem}
+.btn.vlsi{background:var(--vlsi);color:var(--onacc)}.btn.miot{background:var(--miot);color:var(--onacc)}
+
+/* page frame */
+.wrap{max-width:1180px;margin:0 auto;padding:26px 16px 80px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px}
+h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.08;letter-spacing:-.03em;margin:0 0 10px;font-weight:800;max-width:26ch}
+.lede{color:var(--mute);margin:0 0 22px;max-width:60ch}
+
+/* sidebar styled after Microwind's layer palette */
+.side{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 92px);overflow:auto}
+.pal{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px;margin-bottom:12px}
+.pal h2{font-size:.95rem;margin:6px 8px 6px;font-weight:700}
+.pal button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid transparent;background:none;color:inherit;font:inherit;padding:7px 8px;border-radius:8px;cursor:pointer}
+.pal button:hover{background:var(--paper)}
+.pal button[aria-pressed=true]{border-color:var(--ink);background:var(--paper);font-weight:700}
+.pal .sw{width:16px;height:16px;border-radius:3px;border:1px solid color-mix(in srgb,var(--ink) 30%,transparent);flex:none}
+.pal .n{margin-left:auto;color:var(--mute);font-size:.88rem;font-variant-numeric:tabular-nums}
+.jump .gl{margin:8px 8px 4px;font-size:.85rem;color:var(--mute)}.jump .chips{display:flex;flex-wrap:wrap;gap:4px;padding:0 6px 4px}
+.jump a{padding:3px 9px;border:1px solid var(--line);color:var(--ink);text-decoration:none;border-radius:999px;font-size:.88rem}
+.jump a:hover{background:var(--paper);border-color:var(--ink)}
+
+/* study notes */
+.notes{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin-bottom:22px}
+.notes h2{margin:0 0 4px;font-size:1.1rem}.notes p{margin:0 0 12px;color:var(--mute)}
+.notes .acts{display:flex;flex-wrap:wrap;gap:8px}
+.ghost{display:inline-flex;align-items:center;height:36px;padding:0 13px;border:1.5px solid var(--ink);border-radius:var(--r);text-decoration:none;font-weight:600;font-size:.92rem}
+.ghost:hover{background:var(--ink);color:var(--paper)}
+
+/* experiment list */
+.count{color:var(--mute);margin:0 0 10px;min-height:1.5em}
+.group-h{font-size:1.15rem;margin:26px 0 10px;font-weight:800;display:flex;align-items:center;gap:10px}
+.group-h:before{content:"";width:12px;height:12px;border-radius:3px;background:var(--c)}
+.exp{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--c);border-radius:var(--r);margin:0 0 10px;--c:var(--vlsi)}
+.exp.miot{--c:var(--miot)}
+.exp:target{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent)}
+.head{display:flex;gap:12px;align-items:stretch}
+.toggle{flex:1;min-width:0;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:14px 8px 14px 16px;cursor:pointer;display:block}
+.toggle .id{font-weight:800;color:var(--c);margin-right:8px}
+.toggle .ti{font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.toggle .ds{display:block;color:var(--mute);font-size:.95rem;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:.8rem;padding:2px 9px;border-radius:999px;background:var(--tint);color:var(--ink);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+.exp.miot .tag{background:var(--tintg)}
+.chev{display:inline-block;transition:transform .15s;margin-left:6px;color:var(--mute)}
+.toggle[aria-expanded=true] .chev{transform:rotate(90deg)}
+.dl{padding:14px 14px 14px 0;display:flex;align-items:flex-start}
+.panel{border-top:1px solid var(--line);padding:14px 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.panel[hidden]{display:none}
+.panel h3{margin:0 0 6px;font-size:.95rem}
+.panel ul{list-style:none;margin:0;padding:0}
+.panel li{margin:0}
+.panel li a{display:flex;justify-content:space-between;gap:10px;padding:5px 8px;margin:0 -8px;border-radius:7px;text-decoration:none;font-size:.93rem;word-break:break-word}
+.panel li a:hover{background:var(--paper)}
+.panel li a small{color:var(--mute);white-space:nowrap}
+.panel .more{grid-column:1/-1;color:var(--mute);font-size:.92rem}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:26px;text-align:center}
+.empty button{margin-top:10px}
+footer{grid-column:1/-1;color:var(--mute);font-size:.92rem;border-top:1px solid var(--line);padding-top:16px;margin-top:10px}
+
+/* small screens: sidebar becomes a scrolling chip bar */
+@media (max-width:900px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:12px}main,.side{min-width:0}.find{min-width:0}.bar>div{gap:8px}
+  .side{position:static;max-height:none;display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .pal{display:flex;gap:4px;padding:6px;margin:0;flex:none;align-items:center}
+  .pal h2,.jump{display:none}
+  .pal button{width:auto;white-space:nowrap}
+  .brand i{display:none}
+  .bar .btn span{display:none}
+  .head{flex-wrap:wrap}.toggle{flex:1 1 100%}.dl{padding:0 16px 14px}h1{max-width:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#list">Skip to experiments</a>
+<header class="bar"><div>
+  <a class="brand" href="#top"><i></i>Lab files</a>
+  <label class="find"><span hidden>Search experiments</span>
+    <input id="q" type="search" placeholder="Search: NAND, ALU, DHT11, SRAM, Arduino" autocomplete="off"><kbd aria-hidden="true">/</kbd></label>
+  <a class="btn" id="all" href="#"><span>Download all&nbsp;</span>ZIP</a>
+</div></header>
+
+<div class="wrap" id="top">
+  <aside class="side" aria-label="Filters">
+    <div class="pal" id="subjects"><h2>Subject</h2></div>
+    <div class="pal" id="tools"><h2>Tools and boards</h2></div>
+    <nav class="pal jump" id="jump" aria-label="Jump to experiment"><h2>Jump to</h2></nav>
+  </aside>
+
+  <main>
+    <h1>VLSI D&amp;T and MIOT lab files</h1>
+    <p class="lede">Reports, code, simulation images and Microwind layouts for every experiment. Open one for its files, or download its ZIP.</p>
+
+    <section class="notes" aria-labelledby="nh">
+      <h2 id="nh">Study notes</h2>
+      <p>Theory, steps and viva questions. The VLSI notes include the CMOS gate circuits and stick diagrams.</p>
+      <div class="acts" id="notes"></div>
+    </section>
+
+    <p class="count" id="count" role="status" aria-live="polite"></p>
+    <div id="list"></div>
+    <div class="empty" id="empty" hidden><b>No experiments match.</b><br><span>Try a shorter search, or clear the filters.</span><br>
+      <button class="btn sm" id="clear" type="button">Clear filters</button></div>
+
+    <section class="notes" style="margin-top:26px">
+      <h2>More downloads</h2>
+      <p>Whole-subject code, the Microwind layouts and the lab manuals.</p>
+      <div class="acts" id="extra"></div>
+    </section>
+  </main>
+  <footer>Source on <a href="__REPO__">GitHub</a>. Each experiment ZIP holds its PDF, Word doc, code, images and Microwind files. Wi-Fi names, passwords and API keys in the code are placeholders: add your own.</footer>
+</div>
+
+<script>
+const D = __DATA__;
+const $ = (s, r = document) => r.querySelector(s);
+const size = k => k >= 1024 ? (k / 1024).toFixed(1) + " MB" : k + " KB";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+$("#all").href = D.all_zip;
+$("#notes").innerHTML = D.notes.map(n => `<a class="ghost" href="${n.href}">${esc(n.name)}</a>`).join("");
+$("#extra").innerHTML = D.extra.map(n => `<a class="ghost" href="${n.href}">${esc(n.name)}</a>`).join("");
+
+const state = {subject: "", tools: new Set(), q: ""};
+const SUBJ = [["", "All experiments", "var(--ink)"], ["VLSI", "VLSI D&T", "var(--vlsi)"], ["MIOT", "MIOT", "var(--miot)"]];
+const toolCount = {};
+D.exps.forEach(e => e.tags.forEach(t => toolCount[t] = (toolCount[t] || 0) + 1));
+const tools = Object.keys(toolCount).sort((a, b) => toolCount[b] - toolCount[a] || a.localeCompare(b));
+
+function side() {
+  $("#subjects").innerHTML = "<h2>Subject</h2>" + SUBJ.map(([k, l, c]) =>
+    `<button type="button" data-s="${k}" aria-pressed="${state.subject === k}"><span class="sw" style="background:${c}"></span>${l}<span class="n">${D.exps.filter(e => !k || e.subject === k).length}</span></button>`).join("");
+  $("#tools").innerHTML = "<h2>Tools and boards</h2>" + tools.map(t =>
+    `<button type="button" data-t="${esc(t)}" aria-pressed="${state.tools.has(t)}"><span class="sw" style="background:${state.tools.has(t) ? "var(--ink)" : "transparent"}"></span>${esc(t)}<span class="n">${toolCount[t]}</span></button>`).join("");
+}
+function row(e) {
+  const kind = e.subject === "MIOT" ? "miot" : "vlsi";
+  const groups = e.groups.map(g => `<div><h3>${esc(g.name)}</h3><ul>${g.files.map(f =>
+    `<li><a href="${f.href}"><span>${esc(f.name)}</span><small>${size(f.kb)}</small></a></li>`).join("")}</ul></div>`).join("");
+  const img = e.images ? `<p class="more">${e.images.count} output images: <a href="${e.images.href}">browse the img folder</a>. <a href="${e.folder}">Open the whole folder on GitHub</a>.</p>`
+                       : `<p class="more"><a href="${e.folder}">Open the whole folder on GitHub</a>.</p>`;
+  return `<article class="exp ${kind}" id="${e.id}">
+    <div class="head">
+      <button class="toggle" type="button" aria-expanded="false" aria-controls="p-${e.id}">
+        <span><span class="id">${esc(e.code)}</span><span class="ti">${esc(e.title)}</span><span class="chev" aria-hidden="true">&#9656;</span></span>
+        <span class="ds">${esc(e.desc)}</span>
+        <span class="tags">${e.tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</span>
+      </button>
+      <div class="dl"><a class="btn sm ${kind}" href="${e.zip}" download>Download ZIP&nbsp;<small>${size(e.zip_kb)}</small></a></div>
+    </div>
+    <div class="panel" id="p-${e.id}" hidden>${groups}${img}</div></article>`;
+}
+function matches(e) {
+  if (state.subject && e.subject !== state.subject) return false;
+  for (const t of state.tools) if (!e.tags.includes(t)) return false;
+  if (state.q) {
+    const hay = (e.code + " " + e.title + " " + e.desc + " " + e.tags.join(" ") + " " + e.groups.map(g => g.files.map(f => f.name).join(" ")).join(" ")).toLowerCase();
+    return state.q.split(/\s+/).every(w => hay.includes(w));
+  }
+  return true;
+}
+function render() {
+  const open = new Set([...document.querySelectorAll(".toggle[aria-expanded=true]")].map(b => b.closest(".exp").id));
+  const list = D.exps.filter(matches);
+  let html = "", last = "";
+  for (const e of list) {
+    if (e.subject !== last) { last = e.subject; html += `<h2 class="group-h" style="--c:var(--${e.subject === "MIOT" ? "miot" : "vlsi"})">${e.subject === "MIOT" ? "MIOT: Modernized Internet of Things" : "VLSI Design and Technology"}</h2>`; }
+    html += row(e);
+  }
+  $("#list").innerHTML = html;
+  open.forEach(id => { const b = $("#" + id + " .toggle"); if (b) { b.setAttribute("aria-expanded", "true"); $("#p-" + id).hidden = false; } });
+  $("#empty").hidden = list.length > 0;
+  $("#count").textContent = list.length === D.exps.length ? `${list.length} experiments` : `${list.length} of ${D.exps.length} experiments`;
+  $("#jump").innerHTML = "<h2>Jump to</h2>" + ["VLSI", "MIOT"].map(s => { const l = list.filter(e => e.subject === s);
+    return l.length ? `<p class="gl">${s === "VLSI" ? "VLSI D&amp;T" : "MIOT"}</p><div class="chips">${l.map(e => `<a href="#${e.id}">${esc(e.code.slice(4))}</a>`).join("")}</div>` : ""; }).join("");
+  side();
+}
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("button"); if (!t) return;
+  if (t.dataset.s !== undefined) { state.subject = t.dataset.s; render(); }
+  else if (t.dataset.t) { state.tools.has(t.dataset.t) ? state.tools.delete(t.dataset.t) : state.tools.add(t.dataset.t); render(); }
+  else if (t.classList.contains("toggle")) { const ex = t.getAttribute("aria-expanded") === "true"; t.setAttribute("aria-expanded", String(!ex)); $("#" + t.getAttribute("aria-controls")).hidden = ex; }
+  else if (t.id === "clear") { state.subject = ""; state.tools.clear(); state.q = ""; $("#q").value = ""; render(); }
+});
+$("#q").addEventListener("input", ev => { state.q = ev.target.value.toLowerCase().trim(); render(); });
+document.addEventListener("keydown", ev => {
+  if (ev.key === "/" && document.activeElement !== $("#q")) { ev.preventDefault(); $("#q").focus(); }
+  else if (ev.key === "Escape" && document.activeElement === $("#q")) { $("#q").value = ""; state.q = ""; render(); $("#q").blur(); }
+});
+function openHash() { const id = location.hash.slice(1), b = id && $("#" + id + " .toggle"); if (b) { b.setAttribute("aria-expanded", "true"); $("#p-" + id).hidden = false; } }
+window.addEventListener("hashchange", openHash);
+render(); openHash();
+</script>
+</body>
+</html>
