@@ -1,5 +1,7 @@
 # VLSI D&T and MIOT Lab Experiments
 
+**Website with one-click downloads: https://prathameshfuke.github.io/experiments/**
+
 Quick links. Every experiment folder holds its Word doc, PDF, output images and code.
 
 ## Start here
