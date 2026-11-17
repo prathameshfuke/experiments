@@ -25,7 +25,7 @@ NS_R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 NS_D = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 
 def build(path):
-    d = Document(path); out = path.replace("/docs/", "/pdfs/").replace(".docx", ".pdf"); flow = []; codebuf = []
+    d = Document(path); out = path[:-5] + ".pdf"; flow = []; codebuf = []
     def flush():
         if codebuf:
             flow.append(Preformatted("\n".join(codebuf), CODE)); flow.append(Spacer(1, 4)); codebuf.clear()
@@ -64,5 +64,6 @@ def build(path):
     SimpleDocTemplate(out, pagesize=A4, leftMargin=2 * cm, rightMargin=2 * cm, topMargin=2 * cm, bottomMargin=2 * cm,
                       title=path.split("/")[-1][:-5]).build(flow)
 
-for f in sorted(glob.glob("../docs/VLSI D&T EXP *.docx")): build(f)
+import sys
+for f in (sys.argv[1:] or sorted(glob.glob("EXP */VLSI D&T EXP *.docx"))): build(f)
 print("pdfs built")

@@ -1,5 +1,5 @@
 VERSION 16-11-2026 09:59:04
-FIG #C:\Users\ajink\Downloads\Microwind_exp\MUX.MSK
+FIG #MUX.MSK
 BB(-14,-10,26,80)
 SIMU #8.00
 REC(-14,54,40,22,NW)
@@ -51,4 +51,4 @@ TITLE 18 35  #B
 $c 1000 0 0.2250 0.2500 0.4750 0.5000 
 TITLE 10 35  #MUXop
 $v 1000 0 
-FFIG C:\Users\ajink\Downloads\Microwind_exp\MUX.MSK
+FFIG MUX.MSK
