@@ -90,7 +90,7 @@ for f in os.listdir(DL): os.remove(os.path.join(DL, f))
 exps = experiments("vlsi") + experiments("miot")
 notes = []
 for f in sorted(os.listdir("study_notes")):
-    if f.endswith(".pdf"):
+    if f.endswith(".pdf") and f != "VLSI and MIOT Study Notes.pdf":   # the combined PDF is no longer offered on the site
         dst = f.replace(" ", "_").replace("&", "and"); shutil.copy(os.path.join("study_notes", f), os.path.join(DL, dst))
         notes.append({"name": f[:-4], "href": "downloads/" + q(dst)})
 extra = [{"name": "Microwind layouts (ZIP)", "href": RAW + "zips/Microwind_exp.zip"},

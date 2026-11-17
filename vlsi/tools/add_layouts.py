@@ -9,10 +9,6 @@ from layout_render import render
 
 GD = sys.argv[1]
 PLAN = {  # exp number -> [(kind, source, caption)]
-    "06": [("msk", "NOT", "Layout view of the CMOS inverter (NOT.MSK): N-well, P+/N+ diffusion, poly gate, metal 1 and contacts."),
-           ("msk", "NAND", "Layout view of the 2-input NAND (NAND.MSK): two poly gates, parallel PMOS, series NMOS."),
-           ("msk", "NOR", "Layout view of the 2-input NOR (NOR.MSK): series PMOS, parallel NMOS."),
-           ("msk", "HALFADDER", "Layout view of the half adder (HALFADDER.MSK): Sum and Carry outputs.")],
     "07": [("msk", "MUX", "Layout view of the 2-to-1 multiplexer (MUX.MSK).")],
     "08": [("msk", "SRAM", "Layout view of the 6T SRAM cell (SRAM.MSK).")],
     "10": [("msk", "DFF", "Layout view of the CMOS D flip-flop (DFF.MSK).")],

@@ -6,7 +6,7 @@ Quick links. Every experiment folder holds its Word doc, PDF, output images and 
 
 ## Start here
 
-- Study notes: [VLSI D&T](study_notes/VLSI%20D%26T%20Study%20Notes.pdf) (with gate, CMOS and stick diagrams) · [MIOT](study_notes/MIOT%20Study%20Notes.pdf) · [both combined](study_notes/VLSI%20and%20MIOT%20Study%20Notes.pdf)
+- Study notes: [VLSI D&T](study_notes/VLSI%20D%26T%20Study%20Notes.pdf) (with gate, CMOS and stick diagrams) · [MIOT](study_notes/MIOT%20Study%20Notes.pdf)
 - [All code, copied flat by experiment](all_code/)
 - Zips: [VLSI code](zips/VLSI_all_code.zip), [MIOT code](zips/MIOT_all_code.zip), [Microwind layouts](zips/Microwind_exp.zip)
 - [Gate and stick diagrams (PNG)](vlsi/gate_diagrams/)

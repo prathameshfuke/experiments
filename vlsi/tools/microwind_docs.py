@@ -80,64 +80,65 @@ def crossings(t, y, level=VDD / 2):
 
 
 def window(tr, rows, outs, tend, fname, out, cap):
-    """rows: [(node, label)], outs: output node names (red); everything else green."""
+    """Microwind 'Analog simulation' window: black plot, thin green inputs / red outputs, grey level lines, dashed time grid,
+    delay markers with ps labels, control panel at the right, tab strip at the bottom. `cap` is kept for the caller (not drawn)."""
     W, H = 1600, 900
+    GREEN_T, RED_T = "#5ca050", "#be2823"
     fig = plt.figure(figsize=(16, 9), dpi=100, facecolor="white")
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, W); ax.set_ylim(H, 0); ax.axis("off")
     R = lambda x, y, w, h, **k: ax.add_patch(Rectangle((x, y), w, h, **k))
-    R(0, 0, W, 26, fc="white"); R(5, 6, 14, 14, fc="#222")
-    ax.text(26, 13, "Analog simulation of D:\\CMOS_%s" % fname, fontsize=8.5, va="center", color="#333")
-    ax.text(1508, 13, "—", fontsize=10, va="center"); ax.text(1535, 13, "▢", fontsize=10, va="center"); ax.text(1570, 13, "✕", fontsize=10, va="center")
-    x0, x1, y0, y1, gap = 78, 1318, 36, 800, 12
-    n = len(rows); h = (y1 - y0 - gap * (n - 1)) / n
-    step = 1e-9 if tend <= 7e-9 else 2e-9
-    px = lambda t: x0 + t / tend * (x1 - x0)
+    T = lambda x, y, s, **k: ax.text(x, y, s, **k)
+    R(0, 0, W, 26, fc="white"); R(7, 6, 13, 13, fc="#111")
+    T(28, 13, "Analog simulation of D:\\CMOS_%s" % fname, fontsize=8.5, va="center", color="#111")
+    T(1478, 13, "—", fontsize=10, va="center", color="#444"); T(1523, 13, "▢", fontsize=10, va="center", color="#444"); T(1568, 13, "✕", fontsize=10, va="center", color="#444")
+    cx1, cy0, cy1 = 1478, 26, 866                       # black plot area
+    R(0, cy0, cx1, cy1 - cy0, fc="black")
+    x0 = 58; px = lambda t: x0 + t / tend * (cx1 - x0)
+    n = len(rows); top0, bot0 = cy0 + 12, cy1 - 44; h = (bot0 - top0) / n
+    step = 0.5e-9 if tend <= 7e-9 else (1e-9 if tend <= 9e-9 else 2e-9)
     outs_t = [(nm, crossings(tr["t"], tr[nm])) for nm in outs[:1]]
     ins_t = sorted(t for nm, _ in rows if nm not in outs for t in crossings(tr["t"], tr[nm]))
+    for g in np.arange(0, tend + 1e-15, step):
+        ax.plot([px(g)] * 2, [cy0, cy1 - 30], color="white", lw=0.7, ls=(0, (2, 3)), alpha=0.9)
     for k, (nm, lab) in enumerate(rows):
-        top = y0 + k * (h + gap); R(x0, top, x1 - x0, h, fc="black", ec="#777", lw=0.8)
-        py = lambda v, top=top: top + h - 6 - (v / VDD) * (h - 14)
-        for g in np.arange(0, tend + 1e-15, step):
-            ax.plot([px(g)] * 2, [top, top + h], color="white", lw=0.7, ls=(0, (3, 3)), alpha=0.85)
-        for v in (0.0, VDD):
-            ax.plot([x0, x1], [py(v)] * 2, color="white", lw=0.5, ls=(0, (1, 3)), alpha=0.7)
-        ax.plot(px(tr["t"]), py(np.clip(tr[nm], 0, VDD)), color=RED if nm in outs else GREEN, lw=1.6)
-        ax.text(x0 - 6, py(VDD), "%.2f" % VDD, ha="right", va="center", fontsize=7.5)
-        ax.text(x0 - 6, py(0), "0.0", ha="right", va="center", fontsize=7.5)
-        ax.text(14, top + h / 2, lab, rotation=90, va="center", ha="center", fontsize=9)
+        top = top0 + k * h; yv = lambda v, top=top: top + 10 + (1 - v / VDD) * (h - 34)
+        for v in (0.0, VDD / 2, VDD):
+            ax.plot([x0, cx1], [yv(v)] * 2, color="#8a8a8a", lw=0.8)
+        ax.plot(px(tr["t"]), yv(np.clip(tr[nm], 0, VDD)), color=RED_T if nm in outs else GREEN_T, lw=1.2)
+        T(x0 + 6, yv(VDD) - 1, "%.2f" % VDD, fontsize=7.5, color="white", va="center"); T(x0 + 6, yv(0) - 1, "0.0", fontsize=7.5, color="white", va="center")
+        T(14, top + h * 0.62, lab, fontsize=8, color="white", va="center")
     for nm, ts in outs_t:
+        last = len(rows) - 1; ymid = top0 + last * h + 10 + (h - 34) / 2
         for to in ts:
             cand = [t for t in ins_t if 0 < to - t < 0.7e-9]
             if not cand: continue
             ti = max(cand)
-            for tt in (ti, to): ax.plot([px(tt)] * 2, [y0, y1], color="white", lw=0.9, ls=(0, (1, 2)))
-            ax.text(px((ti + to) / 2) + 14, y1 - 30, "%dps" % round((to - ti) * 1e12), color="white", fontsize=8, ha="center",
-                    bbox=dict(fc="black", ec="none", pad=1))
-    for g in np.arange(0, tend + 1e-15, step):
-        ax.text(px(g), y1 + 12, ("%g" % (g * 1e9)), ha="center", va="center", fontsize=8)
-    ax.text(x1, y1 + 28, "Time (ns)", ha="right", va="center", fontsize=8)
-    px0 = 1328; R(px0, 28, 272, 800, fc="#efefef", ec="#bdbdbd")
-    ax.text(px0 + 10, 48, "Display", fontsize=8.5, weight="bold")
-    for i, t in enumerate(["Delay", "Max value"]):
-        R(px0 + 12, 66 + i * 22, 12, 12, fc="white", ec="#555"); ax.text(px0 + 15, 73 + i * 22, "✓", fontsize=8, va="center")
-        ax.text(px0 + 32, 73 + i * 22, t, fontsize=8.5, va="center")
-    ax.text(px0 + 12, 125, "between:", fontsize=8.5); R(px0 + 12, 135, 110, 20, fc="white", ec="#777"); ax.text(px0 + 18, 145, rows[0][0], fontsize=8, va="center")
-    ax.text(px0 + 12, 172, "and:", fontsize=8.5); R(px0 + 12, 182, 110, 20, fc="white", ec="#777"); ax.text(px0 + 18, 192, outs[0], fontsize=8, va="center")
-    ax.text(px0 + 12, 232, "Evaluate", fontsize=8.5, weight="bold")
-    for i, t in enumerate(["Maximum", "Frequency"]):
-        R(px0 + 12, 250 + i * 22, 12, 12, fc="white", ec="#555"); ax.text(px0 + 32, 257 + i * 22, t, fontsize=8.5, va="center")
-    R(px0 + 12, 305, 60, 20, fc="#dcdcdc", ec="#777"); ax.text(px0 + 30, 315, "FFT", fontsize=8.5, va="center")
-    ax.text(px0 + 12, 350, "Time Scale", fontsize=8.5); R(px0 + 12, 360, 70, 20, fc="white", ec="#777")
-    ax.text(px0 + 12, 400, "Step (ps)", fontsize=8.5); R(px0 + 12, 410, 70, 20, fc="white", ec="#777"); ax.text(px0 + 18, 420, "0.300", fontsize=8, va="center")
-    ax.text(px0 + 12, 452, "Load: %s" % ("30 fF on outputs" if cap else "none (parasitics only)"), fontsize=8.5, color="#a00000" if cap else "#006000")
-    for i, t in enumerate(["Reset", "More", "Close", "Print"]):
-        R(px0 + 12, 500 + i * 34, 90, 26, fc="#e4e4e4", ec="#888"); ax.text(px0 + 57, 513 + i * 34, t, fontsize=9, ha="center", va="center")
-    ax.text(px0 + 12, 650, "VDD = %.2f V" % VDD, fontsize=8.5)
-    tabs = ["Voltage vs time", "Voltages and currents", "Voltage vs. voltage", "Frequency vs time", "Eye diagram"]
-    xx = x0
-    for i, t in enumerate(tabs):
-        w = 8.2 * len(t) + 18
-        R(xx, 842, w, 22, fc="white" if i == 0 else "#dcdcdc", ec="#888"); ax.text(xx + 9, 853, t, fontsize=8.5, va="center"); xx += w
+            for tt in (ti, to): ax.plot([px(tt)] * 2, [cy0, cy1 - 30], color="white", lw=0.9)
+            for a, d in ((px(ti), 1), (px(to), -1)): ax.fill([a - 7 * d, a, a - 7 * d], [ymid - 3, ymid, ymid + 3], color="white")
+            T(px(to) + 6, ymid + 12, "%dps" % round((to - ti) * 1e12), color="white", fontsize=7.5, va="center")
+    for g in np.arange(0, tend + 1e-15, step): T(px(g) + 4, cy1 - 18, "%.1f" % (g * 1e9), fontsize=8, color="white", va="center")
+    T(cx1 - 48, cy1 - 18, "Time(ns)", fontsize=8, color="white", va="center")
+    # control panel (Windows grey)
+    p0 = cx1 + 4; R(p0 - 4, cy0, W - p0 + 4, cy1 - cy0, fc="#f0f0f0")
+    def box(y, hh, lab): R(p0 + 2, y, W - p0 - 8, hh, fc="none", ec="#c8c8c8", lw=1); T(p0 + 6, y + 1, lab, fontsize=7.5, va="center", color="#222", bbox=dict(fc="#f0f0f0", ec="none", pad=0.5))
+    def chk(y, lab, on): R(p0 + 8, y - 5, 9, 9, fc="white", ec="#444", lw=0.8); (on and T(p0 + 9, y, "✓", fontsize=7, va="center")); T(p0 + 22, y, lab, fontsize=7.5, va="center")
+    def drop(y, v): R(p0 + 8, y - 8, W - p0 - 26, 16, fc="white", ec="#777", lw=0.8); T(p0 + 11, y, v, fontsize=7.5, va="center"); T(W - 22, y, "▾", fontsize=7, va="center")
+    box(36, 150, "Display"); chk(60, "Delay", True); chk(78, "Bus value", True); T(p0 + 8, 100, "between..", fontsize=7.5, va="center"); drop(118, rows[0][0])
+    T(p0 + 8, 140, "and..", fontsize=7.5, va="center"); drop(158, outs[0])
+    box(200, 118, "Evaluate"); chk(224, "Min/max/Av", False); chk(242, "Frequency", False); drop(266, outs[0])
+    R(p0 + 22, 285, 62, 22, fc="#f0f0f0", ec="#888", lw=0.8); R(p0 + 26, 289, 12, 14, fc="#1a7ad0"); T(p0 + 44, 296, "FFT", fontsize=7.5, va="center")
+    box(332, 70, "Time Scale"); R(p0 + 8, 350, W - p0 - 26, 16, fc="white", ec="#777", lw=0.8); R(p0 + 10, 352, 22, 12, fc="#2a6fd6")
+    R(p0 + 24, 376, 18, 16, fc="#f0f0f0", ec="#888", lw=0.8); R(p0 + 54, 376, 18, 16, fc="#f0f0f0", ec="#888", lw=0.8); T(p0 + 28, 384, "◀", fontsize=6, va="center", color="#2a6fd6"); T(p0 + 58, 384, "▶", fontsize=6, va="center", color="#2a6fd6")
+    box(414, 56, "Step (ps)"); R(p0 + 14, 436, 62, 18, fc="white", ec="#777", lw=0.8); T(p0 + 18, 445, "0.300", fontsize=7.5, va="center")
+    for i, (t, c) in enumerate((("Reset", None), ("More", "#d09020"), ("Close", "#d02020"), ("Print", "#555"))):
+        yb = 484 + i * 40; R(p0 + 4, yb, W - p0 - 12, 32, fc="#f0f0f0", ec="#999", lw=0.9)
+        if c: R(p0 + 10, yb + 10, 12, 12, fc=c)
+        T(p0 + (30 if c else 24), yb + 16, t, fontsize=7.5, va="center")
+    # tabs
+    R(0, cy1, W, H - cy1, fc="#c8c8c8")
+    xx = 4
+    for i, t in enumerate(["Voltage vs. time", "Voltages and currents", "Voltage vs. voltage", "Frequency vs. time", "Eye diagram"]):
+        w = 7.0 * len(t) + 14; R(xx, cy1 + 3, w, 20, fc="white" if i == 0 else "#e4e4e4", ec="#777", lw=0.8); T(xx + 7, cy1 + 13, t, fontsize=7.5, va="center"); xx += w
     fig.savefig(out, dpi=100, facecolor="white"); plt.close(fig)
 
 
