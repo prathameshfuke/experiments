@@ -1,0 +1,16 @@
+// DFF.TXT - gate-level Verilog for Microwind (primitive style, as in the Microwind manual)
+// 1) Start Microwind, File > Select Foundry > cmos012.RUL.
+// 2) Compile > Compile Verilog File, choose this DFF.TXT, click Compile (layout is generated).
+// 3) Simulate > Start Simulation to see the timing diagram.
+// Positive-edge D flip-flop from six NAND gates.
+module dff1(d, clk, q, qb);
+ input d, clk;
+ output q, qb;
+ wire n1, n2, n3, n4;
+ nand nand1(n1, n4, n2);
+ nand nand2(n2, n1, clk);
+ nand nand3(n3, n2, clk, n4);
+ nand nand4(n4, n3, d);
+ nand nand5(q, n2, qb);
+ nand nand6(qb, q, n3);
+endmodule

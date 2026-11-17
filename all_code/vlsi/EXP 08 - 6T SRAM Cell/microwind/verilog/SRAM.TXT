@@ -1,0 +1,15 @@
+// SRAM.TXT - gate-level Verilog for Microwind (primitive style, as in the Microwind manual)
+// 1) Start Microwind, File > Select Foundry > cmos012.RUL.
+// 2) Compile > Compile Verilog File, choose this SRAM.TXT, click Compile (layout is generated).
+// 3) Simulate > Start Simulation to see the timing diagram.
+// Storage cell for the layout compiler: NOR latch set/reset by the word line and the two bit lines.
+// (The 6T transistor-level cell is the hand-drawn SRAM.MSK; the compiler builds the logic function from gates.)
+module sram1(wl, bl, blb, q, qb);
+ input wl, bl, blb;
+ output q, qb;
+ wire set, rst;
+ and and1(set, wl, bl);
+ and and2(rst, wl, blb);
+ nor nor1(q, rst, qb);
+ nor nor2(qb, set, q);
+endmodule

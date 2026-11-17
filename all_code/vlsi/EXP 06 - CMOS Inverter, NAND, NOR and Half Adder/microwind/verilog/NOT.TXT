@@ -1,0 +1,9 @@
+// NOT.TXT - gate-level Verilog for Microwind (primitive style, as in the Microwind manual)
+// 1) Start Microwind, File > Select Foundry > cmos012.RUL.
+// 2) Compile > Compile Verilog File, choose this NOT.TXT, click Compile (layout is generated).
+// 3) Simulate > Start Simulation to see the timing diagram.
+module inv1(a, s);
+ input a;
+ output s;
+ not not1(s, a);
+endmodule

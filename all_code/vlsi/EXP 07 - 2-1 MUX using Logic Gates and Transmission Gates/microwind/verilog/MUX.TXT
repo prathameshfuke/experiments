@@ -1,0 +1,13 @@
+// MUX.TXT - gate-level Verilog for Microwind (primitive style, as in the Microwind manual)
+// 1) Start Microwind, File > Select Foundry > cmos012.RUL.
+// 2) Compile > Compile Verilog File, choose this MUX.TXT, click Compile (layout is generated).
+// 3) Simulate > Start Simulation to see the timing diagram.
+module mux21(d0, d1, s, y);
+ input d0, d1, s;
+ output y;
+ wire sb, w1, w2;
+ not not1(sb, s);
+ nand nand1(w1, d1, s);
+ nand nand2(w2, d0, sb);
+ nand nand3(y, w1, w2);
+endmodule

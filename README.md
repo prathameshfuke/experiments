@@ -44,6 +44,7 @@ Quick links. Every experiment folder holds its Word doc, PDF, output images and 
 
 - Code files are the lab-manual code; my earlier versions sit in `earlier_version/` folders.
 - Arduino sketches: each `.ino` is in a same-name folder, open it in the Arduino IDE.
+- Microwind: each `microwind/` folder has a `verilog/` folder with a `.TXT` file for Compile > Compile Verilog File (checked by logic simulation, not in Microwind itself).
 - Wi-Fi names, passwords and API keys are placeholders. Fill in your own.
 - Output images are simulation-derived, not Vivado/Microwind screenshots. Add your own.
 - `vlsi/tools/` holds the scripts that generated the images and docs.
