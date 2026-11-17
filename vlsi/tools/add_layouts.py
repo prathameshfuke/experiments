@@ -43,8 +43,12 @@ for num, items in PLAN.items():
                    "Check the design rules (Analysis > Design Rule Checker).",
                    "Simulate > Run Simulation and observe Q and Q' against D and the clock."):
             d.add_paragraph(st, style="List Bullet")
-    if any(MARK in p.text for p in d.paragraphs):
-        print("skip (already added):", docx); continue
+    mk = [p for p in d.paragraphs if MARK in p.text]
+    if mk:  # refresh: drop the old layout section (marker paragraph and everything after it)
+        body = d.element.body; cut = False
+        for el in list(body):
+            if el is mk[0]._p: cut = True
+            if cut and not el.tag.endswith("sectPr"): body.remove(el)
     imgdir = os.path.join(exp, "img"); os.makedirs(imgdir, exist_ok=True)
     h = d.add_paragraph().add_run(MARK + "s and stick diagrams"); h.bold = True; h.font.size = Pt(12)
     for kind, src, cap in items:
@@ -54,7 +58,7 @@ for num, items in PLAN.items():
         else:
             out = os.path.join(imgdir, "%s.png" % src)
             shutil.copy(os.path.join(GD, src + ".png"), out)
-        d.add_picture(out, width=Cm(13 if kind == "gd" else 15))
+        d.add_picture(out, width=Cm(13 if kind == "gd" else 16))
         d.paragraphs[-1].alignment = 1
         c = d.add_paragraph().add_run(cap); c.italic = True; c.font.size = Pt(9)
         d.paragraphs[-1].alignment = 1
