@@ -14,37 +14,31 @@ CAP = ParagraphStyle("c", fontName="Helvetica", fontSize=8.8, leading=11, alignm
 NOTE = ParagraphStyle("n", fontName="Helvetica", fontSize=9.5, leading=13, spaceAfter=4)
 
 
-def cell(name, cap, w=8.2 * cm):
+def fit(name, wmax=8.5 * cm, hmax=5.0 * cm):
     p = "%s/%s.png" % (GD, name); iw, ih = ImageReader(p).getSize()
-    return [Image(p, width=w, height=w * ih / iw), Paragraph(cap, CAP)]
+    k = min(wmax / iw, hmax / ih)
+    return Image(p, width=iw * k, height=ih * k)
 
 
-def grid(rows):
-    t = Table(rows, colWidths=[8.8 * cm, 8.8 * cm])
-    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("TOPPADDING", (0, 0), (-1, -1), 6)]))
-    return t
+ROWS = [("NOT (inverter): Y = A'", "not", "not"), ("NAND: Y = (AB)'", "nand", "nand"), ("NOR: Y = (A+B)'", "nor", "nor"),
+        ("AND = NAND + inverter", "and", "and"), ("OR = NOR + inverter", "or", "or"), ("XOR: Y = A'B + AB'", "xor", "xor"),
+        ("XNOR: Y = AB + A'B'", "xnor", "xnor"), ("Transmission gate (S = 1 passes IN to OUT)", "tg", "tg"),
+        ("2:1 MUX with transmission gates: S = 0 passes A, S = 1 passes B", "mux", "mux"), ("6T SRAM cell", "sram", "sram")]
+HEAD = ParagraphStyle("g", fontName="Helvetica-Bold", fontSize=10.5, leading=13, spaceBefore=4, spaceAfter=2)
 
 
-fl = [Paragraph("Gate-level CMOS Diagrams", H1),
-      Paragraph("Every CMOS gate has a PMOS pull-up network to VDD and an NMOS pull-down network to GND. PMOS conduct when the input is 0, NMOS when it is 1. Series = AND-like, parallel = OR-like; the pull-up is the dual of the pull-down.", NOTE),
-      grid([[cell("gate_not", "<b>NOT</b>: Y = A'. 2 transistors."), cell("gate_nand", "<b>NAND</b>: Y = (AB)'. PMOS parallel, NMOS series. 4T.")],
-            [cell("gate_nor", "<b>NOR</b>: Y = (A+B)'. PMOS series, NMOS parallel. 4T."), cell("gate_xor", "<b>XOR</b>: Y = A'B + AB'. Needs A', B' from two inverters.")]]),
-      PageBreak(),
-      Paragraph("Compound Gates, Transmission Gate, MUX and SRAM", H1),
-      grid([[cell("gate_and", "<b>AND</b> = NAND + inverter (6T).", 8.6 * cm), cell("gate_or", "<b>OR</b> = NOR + inverter (6T).", 8.6 * cm)],
-            [cell("gate_xnor", "<b>XNOR</b>: Y = AB + A'B'. Same as XOR with the branches swapped."), cell("gate_tg", "<b>Transmission gate</b>: NMOS + PMOS in parallel passes both 0 and 1 without threshold loss.")],
-            [cell("gate_mux", "<b>2:1 MUX</b>: S=0 passes A, S=1 passes B."), cell("gate_sram", "<b>6T SRAM</b>: two cross-coupled inverters hold the bit, two NMOS access transistors (WL) connect to BL, BL'.")]]),
-      PageBreak(),
-      Paragraph("Stick Diagrams", H1),
-      Paragraph("A stick diagram is a symbolic layout: lines for layers, no sizes. Colours: <font color='#2eaa3c'><b>green</b></font> n-diffusion, <font color='#e8a317'><b>orange</b></font> p-diffusion, <font color='#d62828'><b>red</b></font> polysilicon, <font color='#2f5be7'><b>blue</b></font> metal, black squares are contacts. A transistor forms wherever poly crosses diffusion. VDD rail on top, GND at the bottom, PMOS above NMOS.", NOTE),
-      Paragraph("<b>Steps:</b> 1) draw VDD and GND rails. 2) draw the p- and n-diffusion strips. 3) cross them with poly, one per input. 4) add contacts and join with metal for the output. 5) check series/parallel matches the logic.", NOTE),
-      grid([[cell("stick_not", "<b>NOT</b>: one poly crosses both strips."), cell("stick_nand", "<b>NAND</b>: PMOS parallel (VDD at the ends), NMOS series.")],
-            [cell("stick_nor", "<b>NOR</b>: PMOS series, NMOS parallel (GND at the ends)."), cell("stick_and", "<b>AND</b>: NAND stage, metal to the inverter's poly.")]]),
-      PageBreak(),
-      Paragraph("Stick Diagrams (continued)", H1),
-      grid([[cell("stick_or", "<b>OR</b>: NOR stage + inverter."), cell("stick_xor", "<b>XOR</b>: two series PMOS branches, two series NMOS branches.")],
-            [cell("stick_xnor", "<b>XNOR</b>: XOR with the branches swapped."), cell("stick_tg", "<b>Transmission gate</b>: S on the NMOS, S' on the PMOS.", 6.0 * cm)],
-            [cell("stick_mux", "<b>2:1 MUX</b>: two transmission gates share the output.", 8.4 * cm), cell("stick_sram", "<b>6T SRAM</b>: two inverters + two access NMOS (WL).", 8.4 * cm)]])]
+def row(title, g, st):
+    t = Table([[fit("gate_" + g), fit("stick_" + st)]], colWidths=[8.8 * cm, 8.8 * cm])
+    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                           ("LINEBELOW", (0, 0), (-1, 0), 0.4, colors.HexColor("#cccccc"))]))
+    return [Paragraph(title, HEAD), t]
+
+
+fl = [Paragraph("CMOS Circuit Diagram (left) and Stick Diagram (right)", H1),
+      Paragraph("Each gate has a PMOS pull-up network to VDD and an NMOS pull-down network to GND. Stick-diagram colours: <font color='#2eaa3c'><b>green</b></font> n-diffusion, <font color='#e8a317'><b>orange</b></font> p-diffusion, <font color='#d62828'><b>red</b></font> poly, <font color='#2f5be7'><b>blue</b></font> metal, black squares are contacts; a transistor forms where poly crosses diffusion. <b>Draw it:</b> rails, diffusion strips, poly per input, contacts and metal, then check series/parallel against the logic.", NOTE)]
+for i, r in enumerate(ROWS):
+    if i in (4, 8): fl.append(PageBreak())
+    fl += row(*r)
 SimpleDocTemplate(OUT, pagesize=A4, leftMargin=1.6 * cm, rightMargin=1.6 * cm, topMargin=1.6 * cm, bottomMargin=1.4 * cm, title="Gate and Stick Diagrams").build(fl)
 r = pypdf.PdfReader(SRC); a = pypdf.PdfReader(OUT); w = pypdf.PdfWriter()
 for i, p in enumerate(r.pages):
