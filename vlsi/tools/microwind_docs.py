@@ -216,7 +216,7 @@ def build_exp06(exp):
         head(d, "Output"); italic(d, "Transistor-level transient, VDD = 1.2 V. Rise/fall = 10-90 %."); table(d, metrics(key, a, b))
         head(d, "Comments")
         for c in comments: bullet(d, c)
-        path = os.path.join(exp, "VLSI D&T EXP 06 - %s.docx" % label); d.save(path); out.append(path)
+        os.makedirs(os.path.join(exp, "docx"), exist_ok=True); path = os.path.join(exp, "docx", "VLSI D&T EXP 06 - %s.docx" % label); d.save(path); out.append(path)
     return out
 
 
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     docs = build_exp06(e["06"])
     i7 = lambda k, t: os.path.join(e["07"], "img", "wave_%s_%s.png" % (k, t))
     i8 = lambda k, t: os.path.join(e["08"], "img", "wave_%s_%s.png" % (k, t))
-    d7 = glob.glob(os.path.join(e["07"], "VLSI D&T EXP 07*.docx"))[0]; d8 = glob.glob(os.path.join(e["08"], "VLSI D&T EXP 08*.docx"))[0]
+    d7 = glob.glob(os.path.join(e["07"], "docx", "VLSI D&T EXP 07*.docx"))[0]; d8 = glob.glob(os.path.join(e["08"], "docx", "VLSI D&T EXP 08*.docx"))[0]
     d = Document(d7); keys = ["mux_gates", "mux_tg"]; names = ["Logic-gate MUX", "TG MUX"]
     idx = [i for i, p in enumerate(d.paragraphs) if p.text.strip() == "Transient"]
     for i, k in zip(idx, keys): d.paragraphs[i].text = "Transient " + k      # unique captions so the swap can tell them apart

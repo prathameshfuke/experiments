@@ -1,5 +1,5 @@
 """Render each VLSI D&T EXP *.docx to PDF (reportlab), reading the docx in document order so docx and PDF stay in sync."""
-import glob, io
+import glob, io, os
 from docx import Document
 from docx.table import Table
 from docx.text.paragraph import Paragraph
@@ -25,7 +25,7 @@ NS_R = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
 NS_D = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 
 def build(path):
-    d = Document(path); out = path[:-5] + ".pdf"; flow = []; codebuf = []
+    d = Document(path); out = os.path.join(os.path.dirname(os.path.dirname(path)), os.path.basename(path)[:-5] + ".pdf"); flow = []; codebuf = []
     def flush():
         if codebuf:
             flow.append(Preformatted("\n".join(codebuf), CODE)); flow.append(Spacer(1, 4)); codebuf.clear()
@@ -65,5 +65,5 @@ def build(path):
                       title=path.split("/")[-1][:-5]).build(flow)
 
 import sys
-for f in (sys.argv[1:] or sorted(glob.glob("EXP */VLSI D&T EXP *.docx"))): build(f)
+for f in (sys.argv[1:] or sorted(glob.glob("EXP */docx/VLSI D&T EXP *.docx"))): build(f)
 print("pdfs built")

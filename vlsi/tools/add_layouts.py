@@ -21,11 +21,11 @@ MARK = "Microwind layout view"
 
 for num, items in PLAN.items():
     exp = glob.glob("EXP %s*" % num)[0]
-    found = glob.glob(os.path.join(exp, "VLSI D&T EXP *.docx"))
+    found = glob.glob(os.path.join(exp, "docx", "VLSI D&T EXP *.docx"))
     if found:
         docx = found[0]; d = Document(docx)
     else:  # EXP 10 has no document yet: create a short one
-        docx = os.path.join(exp, "VLSI D&T %s.docx" % exp); d = Document()
+        os.makedirs(os.path.join(exp, "docx"), exist_ok=True); docx = os.path.join(exp, "docx", "VLSI D&T %s.docx" % exp); d = Document()
         t = d.add_paragraph().add_run("VLSI D&T %s" % exp); t.bold = True; t.font.size = Pt(16)
         d.add_paragraph().add_run("Aim: draw and study the layout of a CMOS D flip-flop in Microwind.").italic = True
         r = d.add_paragraph().add_run("Steps"); r.bold = True
