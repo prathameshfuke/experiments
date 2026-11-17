@@ -267,9 +267,35 @@ GATES = [("NOT (Inverter)", "not", b_not, (3.6, 4.6)), ("NAND (4T)", "nand", b_n
          ("XNOR (8T + inverters for A', B')", "xnor", b_xnor, (4.6, 4.8)), ("Transmission gate (2T)", "tg", b_tg, (5.4, 3.2)),
          ("2:1 MUX with transmission gates", "mux", b_mux, (6.2, 4.0)), ("6T SRAM cell", "sram", b_sram, (9.0, 5.6))]
 
+def cap_load(ax, ymid, ygnd, xo, label="CL"):
+    """Load capacitor from the output node (xo, ymid) to ground."""
+    xc = xo + 1.0
+    ax.plot([xo, xc], [ymid, ymid], color=INK, lw=2); ax.plot(xc, ymid, "o", color=INK, ms=5)
+    ax.plot([xc, xc], [ymid, ymid - 0.7], color=INK, lw=2)
+    for dy in (0.7, 0.95): ax.plot([xc - 0.45, xc + 0.45], [ymid - dy] * 2, color=INK, lw=2.4)
+    ax.plot([xc, xc], [ymid - 0.95, ygnd], color=INK, lw=2)
+    for k, w in enumerate((0.35, 0.22, 0.1)): ax.plot([xc - w, xc + w], [ygnd - 0.12 - k * 0.1] * 2, color=INK, lw=2)
+    ax.text(xc + 0.6, ymid - 0.82, label + " (30 fF)", fontsize=10, weight="bold", color=RED, va="center")
+
+
+def make_cl(pu, pd, out):
+    def b(ax):
+        ymid, ygnd, xo = cmos(ax, 0, 0, pu, pd, "")
+        ax.text(xo - 0.1, ymid + 0.3, out, fontsize=11, weight="bold", color=INK)
+        cap_load(ax, ymid, ygnd, xo)
+    return b
+
+
+CL_GATES = [("NOT with load capacitor", "not_cl", make_cl([["A"]], [["A"]], "Y = A'"), (4.8, 4.6)),
+            ("NAND with load capacitor", "nand_cl", make_cl([["A"], ["B"]], [["A", "B"]], "Y = (AB)'"), (5.8, 4.6)),
+            ("NOR with load capacitor", "nor_cl", make_cl([["A", "B"]], [["A"], ["B"]], "Y = (A+B)'"), (5.8, 4.6))]
+
+
 if __name__ == "__main__":
     out = sys.argv[1]; os.makedirs(out, exist_ok=True)
     for title, key, fn, sz in GATES:
+        f = fig_for(title, fn, sz); f.savefig(os.path.join(out, "gate_%s.png" % key), facecolor="white"); plt.close(f)
+    for title, key, fn, sz in CL_GATES:
         f = fig_for(title, fn, sz); f.savefig(os.path.join(out, "gate_%s.png" % key), facecolor="white"); plt.close(f)
     for kind in ("not", "nand", "nor", "and", "or", "xor", "xnor", "tg", "mux", "sram"):
         f = stick(kind); f.savefig(os.path.join(out, "stick_%s.png" % kind), facecolor="white"); plt.close(f)

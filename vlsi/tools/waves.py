@@ -65,7 +65,7 @@ def draw(path, scope, spec, out, tmax=None, title=None, cursor_label=True):
         ax.text(-0.01 * tmax, y0 + 0.45, label, color="#e6e6e6", ha="right", va="center", fontsize=9, family="monospace")
         ax.axhline(y0, color="#333333", lw=0.5)
     ax.set_xlim(0, tmax); ax.set_ylim(0, len(spec))
-    step = next(s for s in [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000] if tmax / s <= 14)
+    step = next(s for s in [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000] if tmax / s <= 14)
     ax.set_xticks(range(0, int(tmax) + 1, step)); ax.set_yticks([])
     ax.tick_params(colors="#cccccc", labelsize=8); ax.grid(axis="x", color="#2a2a2a", lw=0.6)
     for s in ax.spines.values(): s.set_color("#555555")
