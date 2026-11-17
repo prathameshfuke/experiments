@@ -29,7 +29,7 @@ void loop() {
   if (result == 0) {
     Serial.print("Temperature: ");
     Serial.print(temperature);
-    Serial.print(" C\tHumidity: ");
+    Serial.print(" °C\tHumidity: ");
     Serial.print(humidity);
     Serial.println(" %");
   } else {
