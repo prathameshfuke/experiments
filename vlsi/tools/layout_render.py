@@ -9,8 +9,8 @@ from matplotlib.patches import Rectangle
 
 PX_W, PX_H = 1600, 890
 # draw order: layer code, colour, alpha, hatch
-LAYERS = [("NW", "#9db89d", 0.40, ".."), ("DP", "#808000", 0.95, None), ("DN", "#008000", 0.95, None),
-          ("PO", "#ff0000", 0.80, None), ("ME", "#2a52ff", 0.65, None), ("CO", "#d8d8d8", 1.0, None)]
+LAYERS = [("NW", "#0e2e0e", 0.55, None), ("DP", "#a08a20", 0.90, None), ("DN", "#2e8b2e", 0.95, None),
+          ("PO", "#ff2d1a", 0.85, None), ("ME", "#1010ff", 0.85, None), ("CO", "#e4e4ff", 1.0, None)]
 PALETTE = [("Options", "#fff7a8"), ("Metal 6", "#909090"), ("Metal 5", "#3b3b9a"), ("Metal 4", "#4a9a00"), ("Metal 3", "#35358f"),
            ("Metal 2", "#0000c0"), ("Metal 1", "#2a52ff"), ("Polysilicon 2", "#ff0000"), ("Contact", "#d8d8d8"),
            ("Polysilicon", "#ff0000"), ("P+ Diffusion", "#808000"), ("N+ Diffusion", "#008000"), ("N Well", "#b5cdb5")]
@@ -50,10 +50,10 @@ def render(path, out):
         for (x, y, w, h, l) in recs:
             if l != code: continue
             px, py = P(x, y + h)
-            R(px, py, w * s, h * s, fc=col, alpha=a, ec="none" if hatch is None else col, lw=0.4, hatch=hatch, zorder=2)
+            R(px, py, w * s, h * s, fc=col, alpha=a, ec="#2a8a2a" if code == "NW" else "none", lw=1.2, hatch=hatch, zorder=2)
             if code == "CO":
-                ax.plot([px, px + w * s], [py, py + h * s], color="#444", lw=0.8, zorder=3)
-                ax.plot([px, px + w * s], [py + h * s, py], color="#444", lw=0.8, zorder=3)
+                ax.plot([px, px + w * s], [py, py + h * s], color="#303080", lw=0.9, zorder=3)
+                ax.plot([px, px + w * s], [py + h * s, py], color="#303080", lw=0.9, zorder=3)
     for (x, y, t) in titles:
         px, py = P(x, y); ax.text(px, py, t, color="white", fontsize=9, va="bottom", zorder=5)
     ax.text(10, 92, "5 lambda", color="white", fontsize=7.5, va="center")
