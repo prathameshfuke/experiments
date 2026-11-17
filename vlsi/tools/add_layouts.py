@@ -12,18 +12,9 @@ PLAN = {  # exp number -> [(kind, source, caption)]
     "06": [("msk", "NOT", "Layout view of the CMOS inverter (NOT.MSK): N-well, P+/N+ diffusion, poly gate, metal 1 and contacts."),
            ("msk", "NAND", "Layout view of the 2-input NAND (NAND.MSK): two poly gates, parallel PMOS, series NMOS."),
            ("msk", "NOR", "Layout view of the 2-input NOR (NOR.MSK): series PMOS, parallel NMOS."),
-           ("msk", "HALFADDER", "Layout view of the half adder (HALFADDER.MSK): Sum and Carry outputs."),
-           ("gd", "stick_not", "Stick diagram of the inverter."),
-           ("gd", "stick_nand", "Stick diagram of the NAND gate."),
-           ("gd", "stick_nor", "Stick diagram of the NOR gate.")],
-    "07": [("msk", "MUX", "Layout view of the 2-to-1 multiplexer (MUX.MSK)."),
-           ("gd", "gate_tg", "Transmission gate: NMOS and PMOS in parallel."),
-           ("gd", "gate_mux", "2-to-1 MUX built from two transmission gates."),
-           ("gd", "stick_tg", "Stick diagram of the transmission gate."),
-           ("gd", "stick_mux", "Stick diagram of the 2-to-1 MUX.")],
-    "08": [("msk", "SRAM", "Layout view of the 6T SRAM cell (SRAM.MSK)."),
-           ("gd", "gate_sram", "6T SRAM cell: cross-coupled inverters plus two access transistors."),
-           ("gd", "stick_sram", "Stick diagram of the 6T SRAM cell.")],
+           ("msk", "HALFADDER", "Layout view of the half adder (HALFADDER.MSK): Sum and Carry outputs.")],
+    "07": [("msk", "MUX", "Layout view of the 2-to-1 multiplexer (MUX.MSK).")],
+    "08": [("msk", "SRAM", "Layout view of the 6T SRAM cell (SRAM.MSK).")],
     "10": [("msk", "DFF", "Layout view of the CMOS D flip-flop (DFF.MSK).")],
 }
 MARK = "Microwind layout view"
@@ -50,7 +41,7 @@ for num, items in PLAN.items():
             if el is mk[0]._p: cut = True
             if cut and not el.tag.endswith("sectPr"): body.remove(el)
     imgdir = os.path.join(exp, "img"); os.makedirs(imgdir, exist_ok=True)
-    h = d.add_paragraph().add_run(MARK + "s and stick diagrams"); h.bold = True; h.font.size = Pt(12)
+    h = d.add_paragraph().add_run(MARK + "s"); h.bold = True; h.font.size = Pt(12)
     for kind, src, cap in items:
         if kind == "msk":
             out = os.path.join(imgdir, "microwind_%s.png" % src.lower())
