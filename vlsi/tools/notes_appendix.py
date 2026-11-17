@@ -1,7 +1,7 @@
 """Build the gate + stick diagram pages and insert them after the VLSI section (page 14) of the study notes.
 Usage: python3 notes_appendix.py <diagram_dir> <notes_in.pdf> <appendix_out.pdf> <notes_out.pdf>"""
 import sys
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
@@ -14,10 +14,15 @@ CAP = ParagraphStyle("c", fontName="Helvetica", fontSize=8.8, leading=11, alignm
 NOTE = ParagraphStyle("n", fontName="Helvetica", fontSize=9.5, leading=13, spaceAfter=4)
 
 
-def fit(name, wmax=8.5 * cm, hmax=5.0 * cm):
-    p = "%s/%s.png" % (GD, name); iw, ih = ImageReader(p).getSize()
-    k = min(wmax / iw, hmax / ih)
-    return Image(p, width=iw * k, height=ih * k)
+def fit(name, wmax=13.4 * cm, hmax=6.9 * cm):
+    from PIL import Image as PI, ImageChops
+    import io
+    im = PI.open("%s/%s.png" % (GD, name)).convert("RGB")
+    bb = ImageChops.difference(im, PI.new("RGB", im.size, "white")).getbbox()
+    if bb: im = im.crop((max(bb[0] - 12, 0), max(bb[1] - 12, 0), min(bb[2] + 12, im.width), min(bb[3] + 12, im.height)))
+    buf = io.BytesIO(); im.save(buf, "PNG"); buf.seek(0)
+    k = min(wmax / im.width, hmax / im.height)
+    return Image(buf, width=im.width * k, height=im.height * k)
 
 
 ROWS = [("NOT (inverter): Y = A'", "not", "not"), ("NAND: Y = (AB)'", "nand", "nand"), ("NOR: Y = (A+B)'", "nor", "nor"),
@@ -28,7 +33,7 @@ HEAD = ParagraphStyle("g", fontName="Helvetica-Bold", fontSize=10.5, leading=13,
 
 
 def row(title, g, st):
-    t = Table([[fit("gate_" + g), fit("stick_" + st)]], colWidths=[8.8 * cm, 8.8 * cm])
+    t = Table([[fit("gate_" + g), fit("stick_" + st)]], colWidths=[13.7 * cm, 13.7 * cm])
     t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (0, 0), (-1, -1), "CENTER"),
                            ("LINEBELOW", (0, 0), (-1, 0), 0.4, colors.HexColor("#cccccc"))]))
     return [Paragraph(title, HEAD), t]
@@ -37,9 +42,9 @@ def row(title, g, st):
 fl = [Paragraph("CMOS Circuit Diagram (left) and Stick Diagram (right)", H1),
       Paragraph("Each gate has a PMOS pull-up network to VDD and an NMOS pull-down network to GND. Stick-diagram colours: <font color='#2eaa3c'><b>green</b></font> n-diffusion, <font color='#e8a317'><b>orange</b></font> p-diffusion, <font color='#d62828'><b>red</b></font> poly, <font color='#2f5be7'><b>blue</b></font> metal, black squares are contacts; a transistor forms where poly crosses diffusion. <b>Draw it:</b> rails, diffusion strips, poly per input, contacts and metal, then check series/parallel against the logic.", NOTE)]
 for i, r in enumerate(ROWS):
-    if i in (4, 8): fl.append(PageBreak())
+    if i in (2, 4, 6, 8): fl.append(PageBreak())
     fl += row(*r)
-SimpleDocTemplate(OUT, pagesize=A4, leftMargin=1.6 * cm, rightMargin=1.6 * cm, topMargin=1.6 * cm, bottomMargin=1.4 * cm, title="Gate and Stick Diagrams").build(fl)
+SimpleDocTemplate(OUT, pagesize=landscape(A4), leftMargin=1.2 * cm, rightMargin=1.2 * cm, topMargin=1.1 * cm, bottomMargin=1.0 * cm, title="Gate and Stick Diagrams").build(fl)
 r = pypdf.PdfReader(SRC); a = pypdf.PdfReader(OUT); w = pypdf.PdfWriter()
 for i, p in enumerate(r.pages):
     w.add_page(p)
